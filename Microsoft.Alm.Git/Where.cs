@@ -271,6 +271,98 @@ namespace Microsoft.Alm.Git
             return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         }
 
+        public static bool GitDirectory(string startingDirectory, out string path)
+        {
+            const string GitFolderName = ".git";
+
+            if (!String.IsNullOrWhiteSpace(startingDirectory))
+            {
+                var dir = new DirectoryInfo(startingDirectory);
+
+                if (dir.Exists)
+                {
+                    Func<DirectoryInfo, FileSystemInfo> hasOdb = (DirectoryInfo info) =>
+                    {
+                        if (info == null || !info.Exists)
+                            return null;
+
+                        foreach (var item in info.EnumerateFileSystemInfos())
+                        {
+                            if (item != null
+                                && item.Exists
+                                && GitFolderName.Equals(item.Name, StringComparison.OrdinalIgnoreCase))
+                                return item;
+                        }
+
+                        return null;
+                    };
+
+                    FileSystemInfo result = null;
+                    while (dir != null && dir.Exists && dir.Parent != null && dir.Parent.Exists)
+                    {
+                        if ((result = hasOdb(dir)) != null)
+                            break;
+
+                        dir = dir.Parent;
+                    }
+
+                    if (result != null && result.Exists)
+                    {
+                        if (result is DirectoryInfo)
+                        {
+                            path = result.FullName;
+                            return true;
+                        }
+                        else
+                        {
+                            // parse the file like gitdir: ../.git/modules/libgit2sharp
+                            string content = null;
+
+                            using (FileStream stream = (result as FileInfo).OpenRead())
+                            using (StreamReader reader = new StreamReader(stream))
+                            {
+                                content = reader.ReadToEnd();
+                            }
+
+                            Match match;
+                            if ((match = Regex.Match(content, @"gitdir\s*:\s*([^\r\n]+)", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)).Success
+                                && match.Groups.Count > 1)
+                            {
+                                content = match.Groups[1].Value;
+                                content = content.Replace('/', '\\');
+
+                                string localPath = null;
+
+                                if (Path.IsPathRooted(content))
+                                {
+                                    localPath = content;
+                                }
+                                else
+                                {
+                                    localPath = Path.GetDirectoryName(result.FullName);
+                                    localPath = Path.Combine(localPath, content);
+                                }
+
+                                var gitdir = new DirectoryInfo(localPath);
+
+                                if (gitdir.Exists)
+                                {
+                                    path = gitdir.FullName;
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            path = null;
+            return false;
+        }
+
+        public static bool GitDirectory(out string path)
+            => GitDirectory(Environment.CurrentDirectory, out path);
+
         /// <summary>
         /// Gets the path to the Git global configuration file.
         /// </summary>
@@ -308,99 +400,16 @@ namespace Microsoft.Alm.Git
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
         public static bool GitLocalConfig(string startingDirectory, out string path)
         {
-            const string GitFolderName = ".git";
             const string LocalConfigFileName = "config";
 
-            if (!String.IsNullOrWhiteSpace(startingDirectory))
+            if (!GitDirectory(startingDirectory, out string gitdir))
             {
-                var dir = new DirectoryInfo(startingDirectory);
+                string localPath = Path.Combine(gitdir, LocalConfigFileName);
 
-                if (dir.Exists)
+                if (File.Exists(localPath))
                 {
-                    Func<DirectoryInfo, FileSystemInfo> hasOdb = (DirectoryInfo info) =>
-                    {
-                        if (info == null || !info.Exists)
-                            return null;
-
-                        foreach (var item in info.EnumerateFileSystemInfos())
-                        {
-                            if (item != null
-                                && item.Exists
-                                && (GitFolderName.Equals(item.Name, StringComparison.OrdinalIgnoreCase)
-                                    || LocalConfigFileName.Equals(item.Name, StringComparison.OrdinalIgnoreCase)))
-                                return item;
-                        }
-
-                        return null;
-                    };
-
-                    FileSystemInfo result = null;
-                    while (dir != null && dir.Exists && dir.Parent != null && dir.Parent.Exists)
-                    {
-                        if ((result = hasOdb(dir)) != null)
-                            break;
-
-                        dir = dir.Parent;
-                    }
-
-                    if (result != null && result.Exists)
-                    {
-                        if (result is DirectoryInfo)
-                        {
-                            var localPath = Path.Combine(result.FullName, LocalConfigFileName);
-                            if (File.Exists(localPath))
-                            {
-                                path = localPath;
-                                return true;
-                            }
-                        }
-                        else if (result.Name == LocalConfigFileName && result is FileInfo)
-                        {
-                            path = result.FullName;
-                            return true;
-                        }
-                        else
-                        {
-                            // parse the file like gitdir: ../.git/modules/libgit2sharp
-                            string content = null;
-
-                            using (FileStream stream = (result as FileInfo).OpenRead())
-                            using (StreamReader reader = new StreamReader(stream))
-                            {
-                                content = reader.ReadToEnd();
-                            }
-
-                            Match match;
-                            if ((match = Regex.Match(content, @"gitdir\s*:\s*([^\r\n]+)", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)).Success
-                                && match.Groups.Count > 1)
-                            {
-                                content = match.Groups[1].Value;
-                                content = content.Replace('/', '\\');
-
-                                string localPath = null;
-
-                                if (Path.IsPathRooted(content))
-                                {
-                                    localPath = content;
-                                }
-                                else
-                                {
-                                    localPath = Path.GetDirectoryName(result.FullName);
-                                    localPath = Path.Combine(localPath, content);
-                                }
-
-                                if (Directory.Exists(localPath))
-                                {
-                                    localPath = Path.Combine(localPath, LocalConfigFileName);
-                                    if (File.Exists(localPath))
-                                    {
-                                        path = localPath;
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    path = localPath;
+                    return true;
                 }
             }
 
@@ -414,9 +423,7 @@ namespace Microsoft.Alm.Git
         /// <param name="path">Path to the Git local configuration.</param>
         /// <returns><see langword="True"/> if succeeds; <see langword="false"/> otherwise.</returns>
         public static bool GitLocalConfig(out string path)
-        {
-            return GitLocalConfig(Environment.CurrentDirectory, out path);
-        }
+            => GitLocalConfig(Environment.CurrentDirectory, out path);
 
         /// <summary> Gets the path to the Git portable system configuration file. </summary> <param
         /// name="path">Path to the Git portable system configuration</param> <returns><see
