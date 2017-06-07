@@ -36,9 +36,9 @@ namespace Microsoft.Alm.Cli.Test
         [TestMethod]
         public void LoadOperationArgumentsTest()
         {
-            Program._dieExceptionCallback = (Exception e) => Assert.Fail($"Error: {e.ToString()}");
-            Program._dieMessageCallback = (string m) => Assert.Fail($"Error: {m}");
-            Program._exitCallback = (int e, string m) => Assert.Fail($"Error: {e} {m}");
+            Program._dieExceptionCallback = (Exception e, string path, int line, string name) => Assert.Fail($"Error: {e.ToString()}");
+            Program._dieMessageCallback = (string m, string path, int line, string name) => Assert.Fail($"Error: {m}");
+            Program._exitCallback = (int e, string m, string path, int line, string name) => Assert.Fail($"Error: {e} {m}");
 
             var envvars = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {

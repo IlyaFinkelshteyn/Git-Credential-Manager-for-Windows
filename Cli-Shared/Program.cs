@@ -59,9 +59,12 @@ namespace Microsoft.Alm.Cli
         internal static readonly VstsTokenScope VstsCredentialScope = VstsTokenScope.CodeWrite | VstsTokenScope.PackagingRead;
         internal static readonly Github.TokenScope GitHubCredentialScope = Github.TokenScope.Gist | Github.TokenScope.Repo;
 
-        internal static Action<Exception> _dieExceptionCallback = (Exception exception) =>
+        internal static Action<Exception, string, int, string> _dieExceptionCallback = (Exception exception,
+                                                                                        string path,
+                                                                                        int line,
+                                                                                        string name) =>
         {
-            Git.Trace.WriteLine(exception.ToString());
+            Git.Trace.WriteLine(exception.ToString(), path, line, name);
             LogEvent(exception.ToString(), EventLogEntryType.Error);
 
             string message;
@@ -74,12 +77,15 @@ namespace Microsoft.Alm.Cli
                 message = $"{exception.GetType().Name}  encountered.";
             }
 
-            Die(message);
+            Die(message, path, line, name);
         };
 
-        internal static Action<string> _dieMessageCallback = (string message) =>
+        internal static Action<string, string, int, string> _dieMessageCallback = (string message,
+                                                                                   string path,
+                                                                                   int line,
+                                                                                   string name) =>
         {
-            Git.Trace.WriteLine($"fatal: {message}");
+            Git.Trace.WriteLine($"fatal: {message}", path, line, name);
             Program.WriteLine($"fatal: {message}");
 
             Git.Trace.Flush();
@@ -87,11 +93,15 @@ namespace Microsoft.Alm.Cli
             Environment.Exit(-1);
         };
 
-        internal static Action<int, string> _exitCallback = (int exitcode, string message) =>
+        internal static Action<int, string, string, int, string> _exitCallback = (int exitcode,
+                                                                                  string message,
+                                                                                  string path,
+                                                                                  int line,
+                                                                                  string name) =>
         {
             if (!String.IsNullOrWhiteSpace(message))
             {
-                Git.Trace.WriteLine(message);
+                Git.Trace.WriteLine(message, path, line, name);
                 Program.WriteLine(message);
             }
 
@@ -199,14 +209,24 @@ namespace Microsoft.Alm.Cli
             }
         }
 
-        internal static void Die(Exception exception)
-            => _dieExceptionCallback(exception);
+        internal static void Die(Exception exception,
+                                 [System.Runtime.CompilerServices.CallerFilePath] string path = "",
+                                 [System.Runtime.CompilerServices.CallerLineNumber] int line = 0,
+                                 [System.Runtime.CompilerServices.CallerMemberName] string name = "")
+            => _dieExceptionCallback(exception, path, line, name);
 
-        internal static void Die(string message)
-            => _dieMessageCallback(message);
+        internal static void Die(string message,
+                                 [System.Runtime.CompilerServices.CallerFilePath] string path = "",
+                                 [System.Runtime.CompilerServices.CallerLineNumber] int line = 0,
+                                 [System.Runtime.CompilerServices.CallerMemberName] string name = "")
+            => _dieMessageCallback(message, path, line, name);
 
-        internal static void Exit(int exitcode = 0, string message = null)
-            => _exitCallback(exitcode, message);
+        internal static void Exit(int exitcode = 0,
+                                  string message = null,
+                                  [System.Runtime.CompilerServices.CallerFilePath] string path = "",
+                                  [System.Runtime.CompilerServices.CallerLineNumber] int line = 0,
+                                  [System.Runtime.CompilerServices.CallerMemberName] string name = "")
+            => _exitCallback(exitcode, message, path, line, name);
 
         internal static void LoadOperationArguments(OperationArguments operationArguments)
         {
