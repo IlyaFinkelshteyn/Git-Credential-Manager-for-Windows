@@ -163,6 +163,8 @@ namespace Microsoft.Alm.Authentication
 
             if (!string.Equals(currentUser?.Owner.Value, currentUser?.User.Value, StringComparison.Ordinal))
             {
+                Git.Trace.WriteLine("current user lacks privileges to the secure store.");
+
                 var errorMessage = "The current Windows identity '{0}' has mismatched Owner [{1}] and User "
                                  + "[{2}] values, preventing access to the Windows Credential Manager."
                                  + Environment.NewLine
