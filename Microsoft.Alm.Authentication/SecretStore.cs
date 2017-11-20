@@ -87,6 +87,7 @@ namespace Microsoft.Alm.Authentication
         /// <param name="targetUri">The URI of the target for which credentials are being deleted</param>
         public bool DeleteCredentials(TargetUri targetUri)
         {
+            ValidateHasAccess();
             ValidateTargetUri(targetUri);
 
             string targetName = GetTargetName(targetUri);
@@ -101,6 +102,7 @@ namespace Microsoft.Alm.Authentication
         /// <param name="targetUri">The URI of the target for which the token is being deleted</param>
         public bool DeleteToken(TargetUri targetUri)
         {
+            ValidateHasAccess();
             ValidateTargetUri(targetUri);
 
             string targetName = GetTargetName(targetUri);
@@ -114,6 +116,7 @@ namespace Microsoft.Alm.Authentication
         /// </summary>
         public void PurgeCredentials()
         {
+            ValidateHasAccess();
             PurgeCredentials(_namespace);
         }
 
@@ -125,6 +128,7 @@ namespace Microsoft.Alm.Authentication
         /// <returns>A <see cref="Credential"/> from the store is successful; otherwise <see langword="null"/>.</returns>
         public Credential ReadCredentials(TargetUri targetUri)
         {
+            ValidateHasAccess();
             ValidateTargetUri(targetUri);
 
             string targetName = GetTargetName(targetUri);
@@ -140,6 +144,7 @@ namespace Microsoft.Alm.Authentication
         /// <returns>A <see cref="Token"/> from the store is successful; otherwise <see langword="null"/>.</returns>
         public Token ReadToken(TargetUri targetUri)
         {
+            ValidateHasAccess();
             ValidateTargetUri(targetUri);
 
             string targetName = GetTargetName(targetUri);
@@ -149,12 +154,36 @@ namespace Microsoft.Alm.Authentication
         }
 
         /// <summary>
+        /// Validates that the current user has privileges to access the operating system
+        /// secure secret storage vault.
+        /// </summary>
+        public void ValidateHasAccess()
+        {
+            var currentUser = System.Security.Principal.WindowsIdentity.GetCurrent();
+
+            if (!string.Equals(currentUser?.Owner.Value, currentUser?.User.Value, StringComparison.Ordinal))
+            {
+                var errorMessage = "The current Windows identity '{0}' has mismatched Owner [{1}] and User "
+                                 + "[{2}] values, preventing access to the Windows Credential Manager."
+                                 + Environment.NewLine
+                                 + Environment.NewLine
+                                 + "Identity mismatch most often occurs when authentication attempts are performed from a process being run as a user "
+                                 + "other than the user who is actively logged onto the Windows desktop, an elevated console window for example.";
+
+                errorMessage = string.Format(errorMessage, currentUser?.Name, currentUser?.Owner.Value, currentUser?.User.Value);
+
+                throw new System.Security.HostProtectionException(errorMessage);
+            }
+        }
+
+        /// <summary>
         /// Writes credentials for a target URI to the credential store
         /// </summary>
         /// <param name="targetUri">The URI of the target for which credentials are being stored</param>
         /// <param name="credentials">The credentials to be stored</param>
         public bool WriteCredentials(TargetUri targetUri, Credential credentials)
         {
+            ValidateHasAccess();
             ValidateTargetUri(targetUri);
             BaseSecureStore.ValidateCredential(credentials);
 
@@ -171,6 +200,7 @@ namespace Microsoft.Alm.Authentication
         /// <param name="token">The token to be stored</param>
         public bool WriteToken(TargetUri targetUri, Token token)
         {
+            ValidateHasAccess();
             ValidateTargetUri(targetUri);
             Token.Validate(token);
 
