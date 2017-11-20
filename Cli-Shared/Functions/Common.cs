@@ -76,7 +76,7 @@ namespace Microsoft.Alm.Cli
                 case AuthorityType.Auto:
                     Git.Trace.WriteLine($"detecting authority type for '{operationArguments.TargetUri}'.");
 
-                    // detect the authority
+                    // Detect the authority
                     authority = await BaseVstsAuthentication.GetAuthentication(operationArguments.TargetUri,
                                                                                Program.VstsCredentialScope,
                                                                                secrets)
@@ -93,7 +93,7 @@ namespace Microsoft.Alm.Cli
 
                     if (authority != null)
                     {
-                        // set the authority type based on the returned value
+                        // Set the authority type based on the returned value
                         if (authority is VstsMsaAuthentication)
                         {
                             operationArguments.Authority = AuthorityType.MicrosoftAccount;
@@ -130,18 +130,18 @@ namespace Microsoft.Alm.Cli
                         tenantId = result.Value;
                     }
 
-                    // return the allocated authority or a generic AAD backed VSTS authentication object
+                    // Return the allocated authority or a generic AAD backed VSTS authentication object
                     return authority ?? new VstsAadAuthentication(tenantId, Program.VstsCredentialScope, secrets);
 
                 case AuthorityType.Basic:
-                    // enforce basic authentication only
+                    // Enforce basic authentication only
                     basicNtlmSupport = NtlmSupport.Never;
                     goto default;
 
                 case AuthorityType.GitHub:
                     Git.Trace.WriteLine($"authority for '{operationArguments.TargetUri}' is GitHub.");
 
-                    // return a GitHub authentication object
+                    // Return a GitHub authentication object
                     return authority ?? new Github.Authentication(operationArguments.TargetUri,
                                                                   Program.GitHubCredentialScope,
                                                                   secrets,
@@ -152,7 +152,7 @@ namespace Microsoft.Alm.Cli
                 case AuthorityType.Bitbucket:
                     Git.Trace.WriteLine($"authority for '{operationArguments.TargetUri}'  is Bitbucket");
 
-                    // return a Bitbucket authentication object
+                    // Return a Bitbucket authentication object
                     return authority ?? new Bitbucket.Authentication(secrets,
                                                                      bitbucketCredentialCallback,
                                                                      bitbucketOauthCallback);
@@ -160,18 +160,18 @@ namespace Microsoft.Alm.Cli
                 case AuthorityType.MicrosoftAccount:
                     Git.Trace.WriteLine($"authority for '{operationArguments.TargetUri}' is Microsoft Live.");
 
-                    // return the allocated authority or a generic MSA backed VSTS authentication object
+                    // Return the allocated authority or a generic MSA backed VSTS authentication object
                     return authority ?? new VstsMsaAuthentication(Program.VstsCredentialScope, secrets);
 
                 case AuthorityType.Ntlm:
-                    // enforce NTLM authentication only
+                    // Enforce NTLM authentication only
                     basicNtlmSupport = NtlmSupport.Always;
                     goto default;
 
                 default:
                     Git.Trace.WriteLine($"authority for '{operationArguments.TargetUri}' is basic with NTLM={basicNtlmSupport}.");
 
-                    // return a generic username + password authentication object
+                    // Return a generic username + password authentication object
                     return authority ?? new BasicAuthentication(secrets, basicNtlmSupport, basicCredentialCallback, null);
             }
         }
@@ -303,7 +303,7 @@ namespace Microsoft.Alm.Cli
                 var listener = new StreamWriter(fileStream, Encoding.UTF8);
                 Git.Trace.AddListener(listener);
 
-                // write a small header to help with identifying new log entries
+                //  Write a small header to help with identifying new log entries
                 listener.Write('\n');
                 listener.Write($"{DateTime.Now:yyyy.MM.dd HH:mm:ss} Microsoft {program.Title} version {program.Version.ToString(3)}\n");
             }
@@ -334,10 +334,10 @@ namespace Microsoft.Alm.Cli
                 operationArguments.UseConfigSystem = yesno.Value;
             }
 
-            // load/re-load the Git configuration after setting the use local/system config values
+            // Load/re-load the Git configuration after setting the use local/system config values
             operationArguments.LoadConfiguration();
 
-            // if a user-agent has been specified in the environment, set it globally
+            // If a user-agent has been specified in the environment, set it globally
             if (program.TryReadString(operationArguments, null, Program.EnvironHttpUserAgent, out value))
             {
                 Git.Trace.WriteLine($"{Program.EnvironHttpUserAgent} = '{value}'.");
@@ -345,7 +345,7 @@ namespace Microsoft.Alm.Cli
                 Global.UserAgent = value;
             }
 
-            // look for authority settings
+            // Look for authority settings
             if (program.TryReadString(operationArguments, Program.ConfigAuthorityKey, Program.EnvironAuthorityKey, out value))
             {
                 Git.Trace.WriteLine($"{Program.ConfigAuthorityKey} = '{value}'.");
@@ -389,7 +389,7 @@ namespace Microsoft.Alm.Cli
                 }
             }
 
-            // look for interactivity config settings
+            // Look for interactivity config settings
             if (program.TryReadString(operationArguments, Program.ConfigInteractiveKey, Program.EnvironInteractiveKey, out value))
             {
                 Git.Trace.WriteLine($"{Program.EnvironInteractiveKey} = '{value}'.");
@@ -407,7 +407,7 @@ namespace Microsoft.Alm.Cli
                 }
             }
 
-            // look for credential validation config settings
+            // Look for credential validation config settings
             if (program.TryReadBoolean(operationArguments, Program.ConfigValidateKey, Program.EnvironValidateKey, out yesno))
             {
                 Git.Trace.WriteLine($"{Program.ConfigValidateKey} = '{yesno}'.");
@@ -415,7 +415,7 @@ namespace Microsoft.Alm.Cli
                 operationArguments.ValidateCredentials = yesno.Value;
             }
 
-            // look for write log config settings
+            // Look for write log config settings
             if (program.TryReadBoolean(operationArguments, Program.ConfigWritelogKey, Program.EnvironWritelogKey, out yesno))
             {
                 Git.Trace.WriteLine($"{Program.ConfigWritelogKey} = '{yesno}'.");
@@ -423,7 +423,7 @@ namespace Microsoft.Alm.Cli
                 operationArguments.WriteLog = yesno.Value;
             }
 
-            // look for modal prompt config settings
+            // Look for modal prompt config settings
             if (program.TryReadBoolean(operationArguments, Program.ConfigUseModalPromptKey, Program.EnvironModalPromptKey, out yesno))
             {
                 Git.Trace.WriteLine($"{Program.ConfigUseModalPromptKey} = '{yesno}'.");
@@ -431,7 +431,7 @@ namespace Microsoft.Alm.Cli
                 operationArguments.UseModalUi = yesno.Value;
             }
 
-            // look for credential preservation config settings
+            // Look for credential preservation config settings
             if (program.TryReadBoolean(operationArguments, Program.ConfigPreserveCredentialsKey, Program.EnvironPreserveCredentialsKey, out yesno))
             {
                 Git.Trace.WriteLine($"{Program.ConfigPreserveCredentialsKey} = '{yesno}'.");
@@ -439,7 +439,7 @@ namespace Microsoft.Alm.Cli
                 operationArguments.PreserveCredentials = yesno.Value;
             }
 
-            // look for http path usage config settings
+            // Look for http path usage config settings
             if (program.TryReadBoolean(operationArguments, Program.ConfigUseHttpPathKey, null, out yesno))
             {
                 Git.Trace.WriteLine($"{Program.ConfigUseHttpPathKey} = '{value}'.");
@@ -447,7 +447,7 @@ namespace Microsoft.Alm.Cli
                 operationArguments.UseHttpPath = yesno.Value;
             }
 
-            // look for http proxy config settings
+            // Look for http proxy config settings
             if (program.TryReadString(operationArguments, Program.ConfigHttpProxyKey, Program.EnvironHttpProxyKey, out value))
             {
                 Git.Trace.WriteLine($"{Program.ConfigHttpProxyKey} = '{value}'.");
@@ -456,7 +456,7 @@ namespace Microsoft.Alm.Cli
             }
             else
             {
-                // check the git-config http.proxy setting just-in-case
+                // Check the git-config http.proxy setting just-in-case
                 Configuration.Entry entry;
                 if (operationArguments.GitConfiguration.TryGetEntry("http", operationArguments.QueryUri, "proxy", out entry)
                     && !string.IsNullOrWhiteSpace(entry.Value))
@@ -467,7 +467,7 @@ namespace Microsoft.Alm.Cli
                 }
             }
 
-            // look for custom namespace config settings
+            // Look for custom namespace config settings
             if (program.TryReadString(operationArguments, Program.ConfigNamespaceKey, Program.EnvironNamespaceKey, out value))
             {
                 Git.Trace.WriteLine($"{Program.ConfigNamespaceKey} = '{value}'.");
@@ -475,7 +475,7 @@ namespace Microsoft.Alm.Cli
                 operationArguments.CustomNamespace = value;
             }
 
-            // look for custom token duration settings
+            // Look for custom token duration settings
             if (program.TryReadString(operationArguments, Program.ConfigTokenDuration, Program.EnvironTokenDuration, out value))
             {
                 Git.Trace.WriteLine($"{Program.ConfigTokenDuration} = '{value}'.");
@@ -523,7 +523,7 @@ namespace Microsoft.Alm.Cli
                 }
             }
 
-            // fake being part of the Main method for clarity
+            // Fake being part of the Main method for clarity
             Git.Trace.WriteLine(builder.ToString(), memberName: "Main");
             builder = null;
         }
@@ -550,14 +550,14 @@ namespace Microsoft.Alm.Cli
 
                         Task.Run(async () =>
                         {
-                            // attempt to get cached creds or acquire creds if interactivity is allowed
+                            // Attempt to get cached credentials or acquire credentials if interactivity is allowed
                             if ((operationArguments.Interactivity != Interactivity.Always
                                     && (credentials = authentication.GetCredentials(operationArguments.TargetUri)) != null)
                                 || (operationArguments.Interactivity != Interactivity.Never
                                     && (credentials = await basicAuth.AcquireCredentials(operationArguments.TargetUri)) != null))
                             {
                                 Git.Trace.WriteLine("credentials found.");
-                                // no need to save the credentials explicitly, as Git will call back
+                                // No need to save the credentials explicitly, as Git will call back
                                 // with a store command if the credentials are valid.
                             }
                             else
@@ -581,7 +581,7 @@ namespace Microsoft.Alm.Cli
 
                         Task.Run(async () =>
                         {
-                            // attempt to get cached creds -> non-interactive logon -> interactive
+                            // Attempt to get cached credentials -> non-interactive logon -> interactive
                             // logon note that AAD "credentials" are always scoped access tokens
                             if (((operationArguments.Interactivity != Interactivity.Always
                                     && ((credentials = aadAuth.GetCredentials(operationArguments.TargetUri)) != null)
@@ -620,7 +620,7 @@ namespace Microsoft.Alm.Cli
 
                         Task.Run(async () =>
                         {
-                            // attempt to get cached creds -> interactive logon note that MSA
+                            // Attempt to get cached credentials -> interactive logon note that MSA
                             // "credentials" are always scoped access tokens
                             if (((operationArguments.Interactivity != Interactivity.Always
                                     && ((credentials = msaAuth.GetCredentials(operationArguments.TargetUri)) != null)
@@ -725,7 +725,7 @@ namespace Microsoft.Alm.Cli
 
             var envars = operationArguments.EnvironmentVariables;
 
-            // look for an entry in the environment variables
+            // Look for an entry in the environment variables
             string localVal = null;
             if (!string.IsNullOrWhiteSpace(environKey)
                 && envars.TryGetValue(environKey, out localVal))
@@ -735,7 +735,7 @@ namespace Microsoft.Alm.Cli
 
             var config = operationArguments.GitConfiguration;
 
-            // look for an entry in the git config
+            // Look for an entry in the git config
             Configuration.Entry entry;
             if (!string.IsNullOrWhiteSpace(configKey)
                 && config.TryGetEntry(Program.ConfigPrefix, operationArguments.QueryUri, configKey, out entry))
@@ -785,7 +785,7 @@ namespace Microsoft.Alm.Cli
 
             var envars = operationArguments.EnvironmentVariables;
 
-            // look for an entry in the environment variables
+            // Look for an entry in the environment variables
             string localVal;
             if (!string.IsNullOrWhiteSpace(environKey)
                 && envars.TryGetValue(environKey, out localVal)
@@ -797,7 +797,7 @@ namespace Microsoft.Alm.Cli
 
             var config = operationArguments.GitConfiguration;
 
-            // look for an entry in the git config
+            // Look for an entry in the git config
             Configuration.Entry entry;
             if (!string.IsNullOrWhiteSpace(configKey)
                 && config.TryGetEntry(Program.ConfigPrefix, operationArguments.QueryUri, configKey, out entry)

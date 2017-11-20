@@ -40,7 +40,7 @@ namespace Microsoft.Alm.Authentication
         public const string AuthorityHostUrlBase = "https://login.microsoftonline.com";
 
         /// <summary>
-        /// The common Url for logon services in Azure.
+        /// The common url for logon services in Azure.
         /// </summary>
         public const string DefaultAuthorityHostUrl = AuthorityHostUrlBase + "/common";
 

@@ -119,7 +119,7 @@ namespace Microsoft.Alm.Authentication
         /// The identity of the authority tenant; <see cref="Guid.Empty"/> otherwise.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> if the authority is Visual Studio Online; <see langword="false"/> otherwise
+        /// <see langword="true"/> if the authority is Visual Studio Team Services; <see langword="false"/> otherwise
         /// </returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
@@ -134,7 +134,7 @@ namespace Microsoft.Alm.Authentication
 
             if (targetUri.Host.EndsWith(VstsBaseUrlHost, StringComparison.OrdinalIgnoreCase))
             {
-                Git.Trace.WriteLine($"'{targetUri}' is subdomain of '{VstsBaseUrlHost}', checking AAD vs MSA.");
+                Git.Trace.WriteLine($"'{targetUri}' is sub-domain of '{VstsBaseUrlHost}', checking AAD vs MSA.");
 
                 string tenant = null;
                 WebResponse response;
@@ -193,7 +193,7 @@ namespace Microsoft.Alm.Authentication
                 }
             }
 
-            // if all else fails, fallback to basic authentication
+            // if all else fails, fall back to basic authentication
             return new KeyValuePair<bool, Guid>(false, tenantId);
         }
 
@@ -234,7 +234,7 @@ namespace Microsoft.Alm.Authentication
             // Query for the tenant's identity
             Guid tenantId = result.Value;
 
-            // empty Guid is MSA, anything else is AAD
+            // Empty GUID is MSA, anything else is AAD
             if (tenantId == Guid.Empty)
             {
                 Git.Trace.WriteLine("MSA authority detected.");
@@ -284,7 +284,7 @@ namespace Microsoft.Alm.Authentication
         }
 
         /// <summary>
-        /// Generates a "personal access token" or service specific, usage resticted access token.
+        /// Generates a "personal access token" or service specific, usage restricted access token.
         /// </summary>
         /// <param name="targetUri">
         /// The target resource for which to acquire the personal access token for.
@@ -308,12 +308,12 @@ namespace Microsoft.Alm.Authentication
 
             if (options.TokenScope != null)
             {
-                // Take the intersection of the auhority scope and the requested scope
+                // Take the intersection of the authority scope and the requested scope
                 requestedScope &= options.TokenScope;
 
                 // If the result of the intersection is none, then fail
                 if (string.IsNullOrWhiteSpace(requestedScope.Value))
-                    throw new InvalidOperationException("Invalid scope requested. Reqeuested scope would result in no access privileges.");
+                    throw new InvalidOperationException("Invalid scope requested. Requested scope would result in no access privileges.");
             }
 
             Credential credential = null;
@@ -332,7 +332,7 @@ namespace Microsoft.Alm.Authentication
         }
 
         /// <summary>
-        /// Generates a "personal access token" or service specific, usage resticted access token.
+        /// Generates a "personal access token" or service specific, usage restricted access token.
         /// </summary>
         /// <param name="targetUri">
         /// The target resource for which to acquire the personal access token for.

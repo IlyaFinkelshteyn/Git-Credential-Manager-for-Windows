@@ -29,12 +29,12 @@ namespace Microsoft.Alm.Authentication
 {
     /// <summary>
     /// Interface to secure secrets storage which indexes values by target and utilizes the operating
-    /// system keychain / secrets vault.
+    /// system key-chain / secrets vault.
     /// </summary>
     public sealed class SecretStore : BaseSecureStore, ICredentialStore, ITokenStore
     {
         /// <summary>
-        /// Creates a new <see cref="SecretStore"/> backed by the operating system keychain / secrets vault.
+        /// Creates a new <see cref="SecretStore"/> backed by the operating system key-chain / secrets vault.
         /// </summary>
         /// <param name="namespace">The namespace of the secrets written and read by this store.</param>
         /// <param name="credentialCache">
