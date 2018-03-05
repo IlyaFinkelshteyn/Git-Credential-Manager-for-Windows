@@ -32,7 +32,7 @@ namespace Microsoft.Alm.Authentication
     /// <summary>
     /// Interfaces with Azure to perform authentication and identity services.
     /// </summary>
-    internal class AzureAuthority : IAzureAuthority
+    internal class AzureAuthority : Base, IAzureAuthority
     {
         /// <summary>
         /// The base URL for logon services in Azure.
@@ -48,7 +48,8 @@ namespace Microsoft.Alm.Authentication
         /// Creates a new instance of `<see cref="AzureAuthority"/>`.
         /// </summary>
         /// <param name="authorityHostUrl">A non-default authority host URL; otherwise defaults to `<see cref="DefaultAuthorityHostUrl"/>`.</param>
-        public AzureAuthority(string authorityHostUrl = DefaultAuthorityHostUrl)
+        public AzureAuthority(RuntimeContext context, string authorityHostUrl = DefaultAuthorityHostUrl)
+            : base(context)
         {
             if (string.IsNullOrEmpty(authorityHostUrl))
                 throw new ArgumentNullException(nameof(authorityHostUrl));

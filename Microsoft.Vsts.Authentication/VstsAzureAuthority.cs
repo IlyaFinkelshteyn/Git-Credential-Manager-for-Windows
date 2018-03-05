@@ -37,8 +37,8 @@ namespace Microsoft.Alm.Authentication
 {
     internal class VstsAzureAuthority : AzureAuthority, IVstsAuthority
     {
-        public VstsAzureAuthority(string authorityHostUrl = null)
-            : base()
+        public VstsAzureAuthority(RuntimeContext context, string authorityHostUrl = null)
+            : base(context)
         {
             AuthorityHostUrl = authorityHostUrl ?? AuthorityHostUrl;
         }
