@@ -57,7 +57,7 @@ namespace Microsoft.Alm.Authentication
                 throw new ArgumentException("Uri is not Absolute.", nameof(authorityHostUrl));
 
             AuthorityHostUrl = authorityHostUrl;
-            _adalTokenCache = new VstsAdalTokenCache();
+            _adalTokenCache = new VstsAdalTokenCache(context);
         }
 
         private readonly VstsAdalTokenCache _adalTokenCache;
@@ -108,11 +108,11 @@ namespace Microsoft.Alm.Authentication
                     token = new Token(authResult.AccessToken, tenantId, TokenType.Access);
                 }
 
-                Git.Trace.WriteLine($"authority host URL = '{AuthorityHostUrl}', token acquisition succeeded.");
+                Trace.WriteLine($"authority host URL = '{AuthorityHostUrl}', token acquisition succeeded.");
             }
             catch (AdalException)
             {
-                Git.Trace.WriteLine($"authority host URL = '{AuthorityHostUrl}', token acquisition failed.");
+                Trace.WriteLine($"authority host URL = '{AuthorityHostUrl}', token acquisition failed.");
             }
 
             return token;
@@ -154,12 +154,12 @@ namespace Microsoft.Alm.Authentication
                 {
                     token = new Token(authResult.AccessToken, tentantId, TokenType.Access);
 
-                    Git.Trace.WriteLine($"token acquisition for authority host URL = '{AuthorityHostUrl}' succeeded.");
+                    Trace.WriteLine($"token acquisition for authority host URL = '{AuthorityHostUrl}' succeeded.");
                 }
             }
             catch (AdalException)
             {
-                Git.Trace.WriteLine($"token acquisition for authority host URL = '{AuthorityHostUrl}' failed.");
+                Trace.WriteLine($"token acquisition for authority host URL = '{AuthorityHostUrl}' failed.");
             }
 
             return token;

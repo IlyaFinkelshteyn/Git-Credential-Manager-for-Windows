@@ -95,17 +95,17 @@ namespace Microsoft.Alm.Authentication
                 Token token;
                 if ((token = await VstsAuthority.InteractiveAcquireToken(targetUri, ClientId, Resource, new Uri(RedirectUrl), null)) != null)
                 {
-                    Git.Trace.WriteLine($"token acquisition for '{targetUri}' succeeded.");
+                    Trace.WriteLine($"token acquisition for '{targetUri}' succeeded.");
 
                     return await GeneratePersonalAccessToken(targetUri, token, options);
                 }
             }
             catch (AdalException)
             {
-                Git.Trace.WriteLine($"token acquisition for '{targetUri}' failed.");
+                Trace.WriteLine($"token acquisition for '{targetUri}' failed.");
             }
 
-            Git.Trace.WriteLine($"interactive logon for '{targetUri}' failed");
+            Trace.WriteLine($"interactive logon for '{targetUri}' failed");
             return null;
         }
 
@@ -132,17 +132,17 @@ namespace Microsoft.Alm.Authentication
                 Token token;
                 if ((token = await VstsAuthority.InteractiveAcquireToken(targetUri, ClientId, Resource, new Uri(RedirectUrl), null)) != null)
                 {
-                    Git.Trace.WriteLine($"token acquisition for '{targetUri}' succeeded.");
+                    Trace.WriteLine($"token acquisition for '{targetUri}' succeeded.");
 
                     return await GeneratePersonalAccessToken(targetUri, token, requestCompactToken);
                 }
             }
             catch (AdalException)
             {
-                Git.Trace.WriteLine($"token acquisition for '{targetUri}' failed.");
+                Trace.WriteLine($"token acquisition for '{targetUri}' failed.");
             }
 
-            Git.Trace.WriteLine($"interactive logon for '{targetUri}' failed");
+            Trace.WriteLine($"interactive logon for '{targetUri}' failed");
             return null;
         }
 
@@ -164,17 +164,17 @@ namespace Microsoft.Alm.Authentication
                 Token token;
                 if ((token = await VstsAuthority.NoninteractiveAcquireToken(targetUri, ClientId, Resource, new Uri(RedirectUrl))) != null)
                 {
-                    Git.Trace.WriteLine($"token acquisition for '{targetUri}' succeeded");
+                    Trace.WriteLine($"token acquisition for '{targetUri}' succeeded");
 
                     return await GeneratePersonalAccessToken(targetUri, token, options);
                 }
             }
             catch (AdalException)
             {
-                Git.Trace.WriteLine($"failed to acquire for '{targetUri}' token from VstsAuthority.");
+                Trace.WriteLine($"failed to acquire for '{targetUri}' token from VstsAuthority.");
             }
 
-            Git.Trace.WriteLine($"non-interactive logon for '{targetUri}' failed");
+            Trace.WriteLine($"non-interactive logon for '{targetUri}' failed");
             return null;
         }
 
@@ -201,17 +201,17 @@ namespace Microsoft.Alm.Authentication
                 Token token;
                 if ((token = await VstsAuthority.NoninteractiveAcquireToken(targetUri, ClientId, Resource, new Uri(RedirectUrl))) != null)
                 {
-                    Git.Trace.WriteLine($"token acquisition for '{targetUri}' succeeded");
+                    Trace.WriteLine($"token acquisition for '{targetUri}' succeeded");
 
                     return await GeneratePersonalAccessToken(targetUri, token, requestCompactToken);
                 }
             }
             catch (AdalException)
             {
-                Git.Trace.WriteLine($"failed to acquire for '{targetUri}' token from VstsAuthority.");
+                Trace.WriteLine($"failed to acquire for '{targetUri}' token from VstsAuthority.");
             }
 
-            Git.Trace.WriteLine($"non-interactive logon for '{targetUri}' failed");
+            Trace.WriteLine($"non-interactive logon for '{targetUri}' failed");
             return null;
         }
 

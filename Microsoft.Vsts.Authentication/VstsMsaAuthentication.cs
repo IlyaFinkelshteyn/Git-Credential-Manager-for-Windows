@@ -82,7 +82,7 @@ namespace Microsoft.Alm.Authentication
                 Token token;
                 if ((token = await VstsAuthority.InteractiveAcquireToken(targetUri, ClientId, Resource, new Uri(RedirectUrl), QueryParameters)) != null)
                 {
-                    Git.Trace.WriteLine($"token '{targetUri}' successfully acquired.");
+                    Trace.WriteLine($"token '{targetUri}' successfully acquired.");
 
                     return await GeneratePersonalAccessToken(targetUri, token, options);
                 }
@@ -92,7 +92,7 @@ namespace Microsoft.Alm.Authentication
                 Debug.Write(exception);
             }
 
-            Git.Trace.WriteLine($"failed to acquire token for '{targetUri}'.");
+            Trace.WriteLine($"failed to acquire token for '{targetUri}'.");
             return null;
         }
 
@@ -112,7 +112,7 @@ namespace Microsoft.Alm.Authentication
                 Token token;
                 if ((token = await VstsAuthority.InteractiveAcquireToken(targetUri, ClientId, Resource, new Uri(RedirectUrl), QueryParameters)) != null)
                 {
-                    Git.Trace.WriteLine($"token '{targetUri}' successfully acquired.");
+                    Trace.WriteLine($"token '{targetUri}' successfully acquired.");
 
                     return await GeneratePersonalAccessToken(targetUri, token, requestCompactToken);
                 }
@@ -122,7 +122,7 @@ namespace Microsoft.Alm.Authentication
                 Debug.Write(exception);
             }
 
-            Git.Trace.WriteLine($"failed to acquire token for '{targetUri}'.");
+            Trace.WriteLine($"failed to acquire token for '{targetUri}'.");
             return null;
         }
 
