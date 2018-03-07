@@ -58,7 +58,7 @@ namespace Microsoft.Alm.Authentication
         /// <summary>
         /// The handler should use credentials when authenticating.
         /// <para/>
-        /// Requires a coupled `<see cref="NetworkRequestOptions.Authentication"/>` is not `<see langword="null"/>`.
+        /// Requires a coupled `<see cref="NetworkRequestOptions.Authorization"/>` is not `<see langword="null"/>`.
         /// </summary>
         UseCredentials = 1 << 3,
 
@@ -110,7 +110,7 @@ namespace Microsoft.Alm.Authentication
         /// <para/>
         /// This property is ignored unless `<see cref="Flags"/>` contains `<see cref="NetworkRequestOptionFlags.UseCredentials"/>`.
         /// </summary>
-        public Secret Authentication
+        public Secret Authorization
         {
             get { return _authentication; }
             set
@@ -357,9 +357,9 @@ namespace Microsoft.Alm.Authentication
                     throw new ArgumentException("`NetworkRequestOption.CookieContainer` cannot be null with `NetworkRequestOptionFlags.UseCookies`.", nameof(options), inner);
                 }
 
-                if ((options.Flags & NetworkRequestOptionFlags.UseCredentials) != 0 && options.Authentication is null)
+                if ((options.Flags & NetworkRequestOptionFlags.UseCredentials) != 0 && options.Authorization is null)
                 {
-                    var inner = new ArgumentNullException(nameof(options.Authentication));
+                    var inner = new ArgumentNullException(nameof(options.Authorization));
                     throw new ArgumentException("`NetworkRequestOption.Authentication` cannot be null with `NetworkRequestOptionFlags.UseCredentials`.", nameof(options), inner);
                 }
 
@@ -382,7 +382,7 @@ namespace Microsoft.Alm.Authentication
                 }
 
                 if ((options.Flags & NetworkRequestOptionFlags.UseCredentials) != 0
-                    && options.Authentication != null)
+                    && options.Authorization != null)
                 {
                     handler.UseDefaultCredentials = false;
                 }
@@ -427,9 +427,9 @@ namespace Microsoft.Alm.Authentication
                 // Manually add the correct headers for the type of authentication that is happening because if
                 // we rely on the framework to correctly write the headers neither GitHub nor VSTS authentication
                 // works reliably.
-                if (options.Authentication != null)
+                if (options.Authorization != null)
                 {
-                    switch (options.Authentication)
+                    switch (options.Authorization)
                     {
                         case Token token:
                             {
