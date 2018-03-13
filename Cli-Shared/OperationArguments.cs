@@ -37,7 +37,7 @@ namespace Microsoft.Alm.Cli
     internal class OperationArguments : Base
     {
         public OperationArguments(RuntimeContext context, Stream readableStream)
-                : this(context)
+            : this(context)
         {
             if (readableStream is null)
                 throw new ArgumentNullException(nameof(readableStream));
