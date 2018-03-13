@@ -3,6 +3,9 @@ version: "{build}"
 image:
   - Visual Studio 2017
 
+init:
+  - ps: Get-ChildItem -Path . -Include * -File -Recurse | foreach { $_.Delete()}
+
 clone_depth: 10
 
 configuration:
