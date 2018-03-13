@@ -6,7 +6,7 @@ image:
 init:
   - ps: Get-ChildItem -Path . -Include * -File -Recurse | foreach { $_.Delete()}
 
-clone_depth: 10
+clone_depth: 1
 
 configuration:
   - Release
@@ -18,7 +18,7 @@ before_build:
 
 build:
   parallel: true
-  verbosity: minimal
+  verbosity: detailed
 
 build_script:
   - msbuild "GitCredentialManager.sln" /bl:GitCredentialManager.binlog /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /consoleloggerparameters:Verbosity=minimal /maxcpucount /nodeReuse:false /target:"Build" /property:Configuration="%configuration%";Platform="%platform%"
