@@ -15,6 +15,7 @@ platform: Any CPU
 
 before_build:
   - nuget restore
+  - ps: test-path C:\projects\git-credential-manager-for-windows\Cli-Askpass\Program.cs
 
 build:
   parallel: true
