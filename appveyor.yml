@@ -3,7 +3,10 @@ version: "{build}"
 image:
   - Visual Studio 2017
 
-clone_depth: 10
+init:
+  - ps: Get-ChildItem -Path . -Include * -File -Recurse | foreach { $_.Delete()}
+
+clone_depth: 1
 
 configuration:
   - Release
@@ -12,10 +15,11 @@ platform: Any CPU
 
 before_build:
   - nuget restore
+  - ps: test-path C:\projects\git-credential-manager-for-windows\Cli-Askpass\Program.cs
 
 build:
   parallel: true
-  verbosity: minimal
+  verbosity: detailed
 
 build_script:
   - msbuild "GitCredentialManager.sln" /bl:GitCredentialManager.binlog /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /consoleloggerparameters:Verbosity=minimal /maxcpucount /nodeReuse:false /target:"Build" /property:Configuration="%configuration%";Platform="%platform%"
